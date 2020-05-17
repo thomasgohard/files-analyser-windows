@@ -27,11 +27,13 @@ namespace thomasgohard.FilesAnalyser {
 			Console.Write("Analysing " + Path.GetFullPath(rootPathToAnalyse) + ": ");
 			
 			try {
-				string[] filePathsToAnalyse = Directory.GetFiles(rootPathToAnalyse);
-				Console.WriteLine(filePathsToAnalyse.Length + " files found.");
+				DirectoryInfo pathToAnalyseInfo = new DirectoryInfo(rootPathToAnalyse);
+				FileInfo[] filesToAnalyseInfo = pathToAnalyseInfo.GetFiles();
+				
+				Console.WriteLine(filesToAnalyseInfo.Length + " files found.");
 
-				foreach(string filePathToAnalyse in filePathsToAnalyse) {
-					Console.WriteLine(Path.GetFullPath(filePathToAnalyse));
+				foreach(FileInfo fileToAnalyseInfo in filesToAnalyseInfo) {
+					Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length);
 				}
 			} catch(Exception e) {
 				Console.WriteLine(e.GetType().Name + ": " + e.Message);
