@@ -25,22 +25,35 @@ namespace thomasgohard.FilesAnalyser {
 			}
 
 			Console.Write("Analysing " + Path.GetFullPath(rootPathToAnalyse) + ": ");
-			
 			try {
-				DirectoryInfo pathToAnalyseInfo = new DirectoryInfo(rootPathToAnalyse);
-				FileInfo[] filesToAnalyseInfo = pathToAnalyseInfo.GetFiles();
-				
-				Console.WriteLine(filesToAnalyseInfo.Length + " files found.");
-
-				foreach(FileInfo fileToAnalyseInfo in filesToAnalyseInfo) {
-					Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length);
-				}
+				AnalyseDirectory(rootPathToAnalyse);
 			} catch(Exception e) {
 				Console.WriteLine(e.GetType().Name + ": " + e.Message);
 				return 1;
 			}
 
 			return 0;
+		}
+
+		static void AnalyseDirectory(string rootPathToAnalyse) {
+			try {
+				DirectoryInfo pathToAnalyseInfo = new DirectoryInfo(rootPathToAnalyse);
+				FileInfo[] filesToAnalyseInfo = pathToAnalyseInfo.GetFiles();
+				DirectoryInfo[] directoriesToAnalyseInfo = pathToAnalyseInfo.GetDirectories();
+				
+				Console.WriteLine(filesToAnalyseInfo.Length + " files and " + directoriesToAnalyseInfo.Length + " directories found.");
+
+				foreach(FileInfo fileToAnalyseInfo in filesToAnalyseInfo) {
+					Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length);
+				}
+
+				foreach(DirectoryInfo directoryToAnalyseInfo in directoriesToAnalyseInfo) {
+					Console.Write("Analysing " + Path.GetFullPath(rootPathToAnalyse) + ": ");
+					AnalyseDirectory(directoryToAnalyseInfo.FullName);
+				}
+			} catch(Exception e) {
+				throw;
+			}
 		}
 	}
 }
