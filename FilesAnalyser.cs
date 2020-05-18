@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace thomasgohard.FilesAnalyser {
 	class FilesAnalyser {
@@ -44,7 +46,7 @@ namespace thomasgohard.FilesAnalyser {
 				Console.WriteLine(filesToAnalyseInfo.Length + " files and " + directoriesToAnalyseInfo.Length + " directories found.");
 
 				foreach(FileInfo fileToAnalyseInfo in filesToAnalyseInfo) {
-					Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length);
+					Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length + "," + getFileHash(fileToAnalyseInfo.FullName));
 				}
 
 				foreach(DirectoryInfo directoryToAnalyseInfo in directoriesToAnalyseInfo) {
@@ -54,6 +56,19 @@ namespace thomasgohard.FilesAnalyser {
 			} catch(Exception e) {
 				throw;
 			}
+		}
+
+		static string getFileHash(string filePath) {
+			FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+			SHA512 FileHasher = new SHA512Managed();
+			byte[] FileHash = FileHasher.ComputeHash(fs);
+			
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < FileHash.Length; i++) {
+				sb.Append(FileHash[i].ToString("x2"));
+			}
+
+			return sb.ToString();
 		}
 	}
 }
