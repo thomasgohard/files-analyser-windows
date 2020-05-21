@@ -5,6 +5,7 @@ using System.Text;
 
 namespace thomasgohard.FilesAnalyser {
 	class FilesAnalyser {
+		static private StreamWriter outputStream;
 		static int Main(string[] args) {
 			string rootPathToAnalyse;
 			
@@ -28,7 +29,11 @@ namespace thomasgohard.FilesAnalyser {
 
 			Console.Write("Analysing " + Path.GetFullPath(rootPathToAnalyse) + ": ");
 			try {
-				AnalyseDirectory(rootPathToAnalyse);
+				//outputStream = new StreamWriter("file-inventory.csv", false, Encoding.UTF8);
+				using(outputStream = new StreamWriter("file-inventory.csv", false, Encoding.UTF8)) {
+					outputStream.WriteLine("Name,Path,Type,Size,Hash");
+					AnalyseDirectory(rootPathToAnalyse);
+				}
 			} catch(Exception e) {
 				Console.WriteLine(e.GetType().Name + ": " + e.Message);
 				return 1;
@@ -46,7 +51,8 @@ namespace thomasgohard.FilesAnalyser {
 				Console.WriteLine(filesToAnalyseInfo.Length + " files and " + directoriesToAnalyseInfo.Length + " directories found.");
 
 				foreach(FileInfo fileToAnalyseInfo in filesToAnalyseInfo) {
-					Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length + "," + getFileHash(fileToAnalyseInfo.FullName));
+					//Console.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length + "," + getFileHash(fileToAnalyseInfo.FullName));
+					outputStream.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length + "," + getFileHash(fileToAnalyseInfo.FullName));
 				}
 
 				foreach(DirectoryInfo directoryToAnalyseInfo in directoriesToAnalyseInfo) {
@@ -59,16 +65,20 @@ namespace thomasgohard.FilesAnalyser {
 		}
 
 		static string getFileHash(string filePath) {
-			FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-			SHA512 FileHasher = new SHA512Managed();
-			byte[] FileHash = FileHasher.ComputeHash(fs);
-			
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < FileHash.Length; i++) {
-				sb.Append(FileHash[i].ToString("x2"));
-			}
+			try {
+				FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+				SHA512 FileHasher = new SHA512Managed();
+				byte[] FileHash = FileHasher.ComputeHash(fs);
+				
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < FileHash.Length; i++) {
+					sb.Append(FileHash[i].ToString("x2"));
+				}
 
-			return sb.ToString();
+				return sb.ToString();
+			} catch(Exception e) {
+				return "Unable to calculate file hash.";
+			}
 		}
 	}
 }
