@@ -8,10 +8,9 @@ namespace thomasgohard.FilesAnalyser {
 		static private bool recursive = false;
 		static private bool calculateHash = false;
 		static private StreamWriter outputStream;
+
 		static int Main(string[] args) {
 			string rootPathToAnalyse;
-			/*bool recursive = false;
-			bool calculateHash = false;*/
 			
 			if (args.Length < 1) {
 				Console.WriteLine("Invalid number of arguments: Please provide a path to a directory to analyse at a minimum.");
@@ -31,9 +30,6 @@ namespace thomasgohard.FilesAnalyser {
 							Console.WriteLine("Invalid option flag: " + args[i].Substring(1) + ". Ignoring flag.");
 							break;
 					}
-					/*if (args[i].Substring(1) == "r") {
-						recursive = true;
-					}*/
 				}
 			}
 			rootPathToAnalyse = args[args.Length - 1];
