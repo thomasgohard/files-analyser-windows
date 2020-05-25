@@ -5,10 +5,13 @@ using System.Text;
 
 namespace thomasgohard.FilesAnalyser {
 	class FilesAnalyser {
+		static private bool recursive = false;
+		static private bool calculateHash = false;
 		static private StreamWriter outputStream;
 		static int Main(string[] args) {
 			string rootPathToAnalyse;
-			bool recursive = false;
+			/*bool recursive = false;
+			bool calculateHash = false;*/
 			
 			if (args.Length < 1) {
 				Console.WriteLine("Invalid number of arguments: Please provide a path to a directory to analyse at a minimum.");
@@ -17,9 +20,20 @@ namespace thomasgohard.FilesAnalyser {
 
 			for (int i = 0; i < (args.Length - 1); i++) {
 				if (args[i].Substring(0, 1) == "-") {	// option flag
-					if (args[i].Substring(1) == "r") {
-						recursive = true;
+					switch (args[i].Substring(1)) {
+						case "c":
+							calculateHash = true;
+							break;
+						case "r":
+							recursive = true;
+							break;
+						default:
+							Console.WriteLine("Invalid option flag: " + args[i].Substring(1) + ". Ignoring flag.");
+							break;
 					}
+					/*if (args[i].Substring(1) == "r") {
+						recursive = true;
+					}*/
 				}
 			}
 			rootPathToAnalyse = args[args.Length - 1];
@@ -65,7 +79,11 @@ namespace thomasgohard.FilesAnalyser {
 				Console.WriteLine(filesToAnalyseInfo.Length + " files and " + directoriesToAnalyseInfo.Length + " directories found.");
 
 				foreach(FileInfo fileToAnalyseInfo in filesToAnalyseInfo) {
-					outputStream.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length + "," + getFileHash(fileToAnalyseInfo.FullName));
+					string fileHash = "";
+					if (calculateHash) {
+						fileHash = getFileHash(fileToAnalyseInfo.FullName);
+					}
+					outputStream.WriteLine(fileToAnalyseInfo.Name + "," + fileToAnalyseInfo.DirectoryName + "," + fileToAnalyseInfo.Extension + "," + fileToAnalyseInfo.Length + "," + fileHash);
 				}
 
 				if (recursive) {
